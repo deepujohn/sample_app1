@@ -65,3 +65,14 @@ Now install rspec
 ````console
 rails generate rspec:install
 ````
+Push the app to git and for version control
+````console
+git checkout -b static-pages
+````
+###Generate a controller
+
+We can generate a controller with no test framework
+````console
+ rails generate controller StaticPages home help --no-test-framework
+````
+Notice that CamelCase plural is used for controller name.
