@@ -196,11 +196,94 @@ end
 To resolve this problem add this to application.html.erb
 
 ````html.erb
-    <title>Ruby on Rails Tutorial Sample App | <%= yield(:title) %></title>
+<title>Ruby on Rails Tutorial Sample App | <%= yield(:title) %></title>
 ````
 and to all views like sample shown for home
 
 ````html.erb
 <% provide(:title, 'Home') %>
 ````    
+We can use 
+
+````console
+rspec spec/requests/static_pages_spec.rb
+````
+or
+````console
+rspec spec
+````
+alone if our rvm version is 1.11.x or greater
+
+###Automated tests with guard
+
+First of all add guard to gem file
+````ruby
+ group :development, :test do
+  ..........................
+  ..........................
+  gem 'guard-rspec', '2.5.0'
+ end 
+````
+Then initialize Guard so that it works with RSpec:
+````console
+bundle exec guard init rspec
+````
+Now goto Guardfile and replace whole by
+````ruby
+require 'active_support/inflector'
+
+# A sample Guardfile
+# More info at https://github.com/guard/guard#readme
+
+guard 'rspec' , all_after_pass: false do
+  watch(%r{^spec/.+_spec\.rb$})
+  watch(%r{^lib/(.+)\.rb$})     { |m| "spec/lib/#{m[1]}_spec.rb" }
+  watch('spec/spec_helper.rb')  { "spec" }
+
+  # Rails example
+  watch(%r{^app/(.+)\.rb$})                           { |m| "spec/#{m[1]}_spec.rb" }
+  watch(%r{^app/(.*)(\.erb|\.haml)$})                 { |m| "spec/#{m[1]}#{m[2]}_spec.rb" }
+  watch(%r{^app/controllers/(.+)_(controller)\.rb$})  { |m| ["spec/routing/#{m[1]}_routing_spec.rb", "spec/#{m[2]}s/#{m[1]}_#{m[2]}_spec.rb", "spec/acceptance/#{m[1]}_spec.rb"] }
+  watch(%r{^spec/support/(.+)\.rb$})                  { "spec" }
+  watch('config/routes.rb')                           { "spec/routing" }
+   # Custom Rails Tutorial specs
+  watch(%r{^app/controllers/(.+)_(controller)\.rb$}) do |m|
+    ["spec/routing/#{m[1]}_routing_spec.rb",
+     "spec/#{m[2]}s/#{m[1]}_#{m[2]}_spec.rb",
+     "spec/acceptance/#{m[1]}_spec.rb",
+     (m[1][/_pages/] ? "spec/requests/#{m[1]}_spec.rb" :
+                       "spec/requests/#{m[1].singularize}_pages_spec.rb")]
+  end
+  watch(%r{^app/views/(.+)/}) do |m|
+    (m[1][/_pages/] ? "spec/requests/#{m[1]}_spec.rb" :
+                      "spec/requests/#{m[1].singularize}_pages_spec.rb")
+  end
+  watch(%r{^app/controllers/sessions_controller\.rb$}) do |m|
+    "spec/requests/authentication_pages_spec.rb"
+  end
+  
+  watch('app/controllers/application_controller.rb')  { "spec/controllers" }
+
+  # Capybara features specs
+  watch(%r{^app/views/(.+)/.*\.(erb|haml)$})          { |m| "spec/features/#{m[1]}_spec.rb" }
+
+  # Turnip features and steps
+  watch(%r{^spec/acceptance/(.+)\.feature$})
+  watch(%r{^spec/acceptance/steps/(.+)_steps\.rb$})   { |m| Dir[File.join("**/#{m[1]}.feature")][0] || 'spec/acceptance' }
+end
+
+
+````
+
+To test use
+
+````console
+guard
+````
+and if you are using older version
+````console
+ bundle exec guard
+````
+
+
 
