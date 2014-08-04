@@ -76,3 +76,131 @@ We can generate a controller with no test framework
  rails generate controller StaticPages home help --no-test-framework
 ````
 Notice that CamelCase plural is used for controller name.
+
+###Testing our app
+
+For testing our app we can generate one rspec integration test
+````console
+rails generate integration_test static_pages
+````
+To test our home page we can modify our spec/requests/static_pages_spec.rb
+
+````ruby
+require 'spec_helper'
+
+describe "Static pages" do
+
+  describe "Home page" do
+
+    it "should have the content 'Sample App'" do
+      visit '/static_pages/home'
+      expect(page).to have_content('Sample App')
+    end
+  end
+end
+````
+Now add capybara DSL to spec/spec_helper.rb
+````ruby
+RSpec.configure do |config|
+  .
+  .
+  .
+  config.include Capybara::DSL
+end
+
+````
+For testing our app we can use
+
+````console
+bundle exec rspec spec/requests/static_pages_spec.rb
+````
+To pass test we can modify our home view as 
+````html
+<h1>Sample App</h1>
+<p>
+  This is the home page for the
+  <a href="http://railstutorial.org/">Ruby on Rails Tutorial</a>
+  sample application.
+</p>
+````
+Now for testing help add this to static_pages_spec.rb
+````ruby
+ describe "Help page" do
+
+    it "should have the content 'Help'" do
+      visit '/static_pages/help'
+      expect(page).to have_content('Help')
+    end
+  end
+````
+*Try yourself pass this!*
+
+Now after that add this 
+````ruby 
+ describe "About page" do
+
+    it "should have the content 'About Us'" do
+      visit '/static_pages/about'
+      expect(page).to have_content('About Us')
+    end
+  end
+````
+###For testing title 
+Now for testing title our static_pages_spec.rb should be
+````ruby 
+require 'spec_helper'
+
+describe "Static pages" do
+
+  describe "Home page" do
+
+    it "should have the content 'Sample App'" do
+      visit '/static_pages/home'
+      expect(page).to have_content('Sample App')
+    end
+
+    it "should have the title 'Home'" do
+      visit '/static_pages/home'
+      expect(page).to have_title("Ruby on Rails Tutorial Sample App | Home")
+    end
+  end
+
+  describe "Help page" do
+
+    it "should have the content 'Help'" do
+      visit '/static_pages/help'
+      expect(page).to have_content('Help')
+    end
+
+    it "should have the title 'Help'" do
+      visit '/static_pages/help'
+      expect(page).to have_title("Ruby on Rails Tutorial Sample App | Help")
+    end
+  end
+
+  describe "About page" do
+
+    it "should have the content 'About Us'" do
+      visit '/static_pages/about'
+      expect(page).to have_content('About Us')
+    end
+
+    it "should have the title 'About Us'" do
+      visit '/static_pages/about'
+      expect(page).to have_title("Ruby on Rails Tutorial Sample App | About Us")
+    end
+  end
+end
+````
+
+To resolve this problem add this to application.html.erb
+
+````html.erb
+    <title>Ruby on Rails Tutorial Sample App | <%= yield(:title) %></title>
+````
+and to all views like sample shown for home
+
+````html.erb
+<% provide(:title, 'Home') %>
+````    
+
