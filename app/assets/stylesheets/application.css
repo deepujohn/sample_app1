@@ -11,3 +11,14 @@
  *= require_self
  *= require_tree .
  */
+body {
+    animation-duration: 0s;
+    animation-iteration-count: 1;
+    animation-name: roll;
+}
+ 
+
+@keyframes roll {
+    from { transform: rotate(0deg) }
+    to   { transform: rotate(360deg) }
+}

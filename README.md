@@ -1,4 +1,5 @@
 ##Sample App
+Please note that I am using sublime text editor and terminal
 To create
 ````console
 rails _4.0.8_ new sample_app -T
@@ -403,6 +404,51 @@ Now add this to the end of Guardfile
 guard 'rspec',all_after_pass:false,cli:'--drb' do
 end  
 ````
+Now go and find sublime text editor packages directory using terminal and run command
+````console
+git clone https://github.com/maltize/sublime-text-2-ruby-tests.git RubyTest
+````
+
+Now restart your sublime text editor
+
+then give this changes to Preferences > Package Settings > RubyTest > Settings - User
+
+````JSON
+{
+  "check_for_rbenv": true,
+  "check_for_rvm": true,
+  "check_for_bundler": true
+}
+````
+Now you will be able to run tests from sublime text editor itself
+
+first goto your spec/static_pages_spec.rb and then
+with 
+
+`Ctrl+Shift+R` to run a single block of test
+`Ctrl+Shift+E` to run last test
+`Ctrl+Shift+T` to run all tests in a current file
+
+Next add this lines to helpers/application_helper.rb
+
+````ruby
+ def full_title(page_title)
+    base_title = "Ruby on Rails Tutorial Sample App"
+    if page_title.empty?
+      base_title
+    else
+      "#{base_title} | #{page_title}"
+    end
+  end
+````
+and to layouts/application.html.erb
+
+````html.erb
+<title><%= full_title yield(:title) %></title>
+````
+
+
+
 
 
 
